@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Set this hostname
+HOSTNAME=`hostname --short`
+
+# Set Graphite host
+GRAPHITE='192.168.0.77'
+GRAPHITE_PORT=2003
+
+# Loop forever
+while :
+do
+	# Get epoch
+	DATE=`date +%s`
+	CPU_USAGE=$(ps aux | awk {'sum+=$3;print sum'} | tail -n 1)
+	MEM_USAGE=$(ps aux | awk {'sum+=$4;print sum'} | tail -n 1)
+	
+	# Send data to Graphite
+	echo "server.cpu.${HOSTNAME}:${CPU_USAGE}|c" | nc -w 1 -u $GRAPHITE 8125
+	echo "server.mem.${HOSTNAME}:${MEM_USAGE}|c" | nc -w 1 -u $GRAPHITE 8125
+
+	sleep 1
+done
