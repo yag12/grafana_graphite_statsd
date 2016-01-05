@@ -1,3 +1,4 @@
 #! /bin/bash
 
-docker run -d -v /etc/localtime:/etc/localtime:ro -p 8001:80 -p 8125:8125/udp -p 8126:8126 grafana_graphite
+docker run -d -v /etc/localtime:/etc/localtime:ro -p 8001:80 -p 8125:8125/udp -p 8126:8126 grafana_log
+#sudo docker run -a stdin -a stdout -i -t grafana_log /bin/bash
