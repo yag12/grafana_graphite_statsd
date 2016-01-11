@@ -17,12 +17,16 @@ do
 	#CPU_USAGE=$(mpstat | tail -1 | awk '{print 100-$12}')
 	MEM_USAGE=$(ps aux | awk {'sum+=$4;print sum'} | tail -n 1)
 	#MEM_USAGE=$(top -n 1 | grep Mem: | awk '{print $6/$4*100}')
+	NODEJS_CPU=$(ps aux |grep cluster.js |awk {'sum+=$3; print sum'} |tail -n 1)
+	NODEJS_MEM=$(ps aux |grep cluster.js |awk {'sum+=$4; print sum'} |tail -n 1)
 	
 	# Send data to Graphite
-	echo $HOSTNAME
-	echo `date` " ::::: " $CPU_USAGE "+++++++++" $MEM_USAGE
-	echo "server.cpu.${HOSTNAME}:${CPU_USAGE}|c" | nc -w 1 -u $GRAPHITE $GRAPHITE_PORT
-	echo "server.mem.${HOSTNAME}:${MEM_USAGE}|c" | nc -w 1 -u $GRAPHITE $GRAPHITE_PORT
+	# system cpu,memory
+	# nodejs cpu,memory
+	echo "${HOSTNAME}.system.cpu:${CPU_USAGE}|g
+	${HOSTNAME}.system.mem:${MEM_USAGE}|g
+	${HOSTNAME}.nodejs.cpu:${NODEJS_CPU}|g
+	${HOSTNAME}.nodejs.mem:${NODEJS_MEM}|g" | nc -w 1 -u $GRAPHITE $GRAPHITE_PORT
 
 	DATE=`date +%s`
 	sleep `expr $NEXTDATE - $DATE`
